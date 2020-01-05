@@ -15,7 +15,7 @@ namespace DSC.IO
             get
             {
                 if (m_hInstance == null && m_bAppStart && !m_bAppQuit)
-                    Debug.LogError("Don't have SaveLoadManager in scene.");
+                    Debug.LogWarning("Don't have SaveLoadManager in scene.");
 
                 return m_hInstance;
             }
