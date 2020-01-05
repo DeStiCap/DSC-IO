@@ -4,13 +4,20 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace DSC.IO
 {
-    public static class SaveLoadSystem<SaveLoadData> where SaveLoadData : class
+    public static class SaveLoadSystem<SaveLoadData>
     {
         public static void Save(SaveLoadData hData,string sFileName)
         {
+            string sFolder = Path.Combine(Application.persistentDataPath, "Save");
             sFileName += ".sav";
+            
+            if (!Directory.Exists(sFolder))
+            {
+                Directory.CreateDirectory(sFolder);
+            }
+
             BinaryFormatter hFormatter = new BinaryFormatter();            
-            string sPath = Path.Combine(Application.persistentDataPath, sFileName);
+            string sPath = Path.Combine(sFolder, sFileName);
             FileStream hStream = new FileStream(sPath, FileMode.Create);
 
             hFormatter.Serialize(hStream, hData);
@@ -19,8 +26,16 @@ namespace DSC.IO
 
         public static SaveLoadData Load(string sFileName)
         {
+            string sFolder = Path.Combine(Application.persistentDataPath, "Save");
+            if (!Directory.Exists(sFolder))
+            {
+                Debug.LogError("Save folder not found in " + sFolder);
+                return default;
+            }
+
             sFileName += ".sav";
-            string sPath = Path.Combine(Application.persistentDataPath, sFileName);
+
+            string sPath = Path.Combine(sFolder, sFileName);
             if (File.Exists(sPath))
             {
                 BinaryFormatter hFormatter = new BinaryFormatter();
@@ -33,7 +48,7 @@ namespace DSC.IO
             else
             {
                 Debug.LogError("Save file not found in " + sPath);
-                return null;
+                return default;
             }
         }
     }

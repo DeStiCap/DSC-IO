@@ -27,7 +27,7 @@ namespace DSC.IO
         protected static bool m_bAppStart;
         protected static bool m_bAppQuit;
 
-        protected Dictionary<string, BaseSaveLoadData> m_dicData = new Dictionary<string, BaseSaveLoadData>();
+        protected Dictionary<string, ISaveable> m_dicData = new Dictionary<string, ISaveable>();
 
         #endregion
 
@@ -67,7 +67,7 @@ namespace DSC.IO
 
         #region Main
 
-        public static void Save<Data>(Data hData,string sFileName) where Data : BaseSaveLoadData
+        public static void Save<Data>(Data hData,string sFileName) where Data : ISaveable
         {
             if (Instance == null)
                 return;
@@ -75,63 +75,64 @@ namespace DSC.IO
             m_hInstance.MainSave(hData, sFileName);
         }
 
-        protected virtual void MainSave<Data>(Data hData,string sFileName) where Data : BaseSaveLoadData
+        protected virtual void MainSave<Data>(Data hData,string sFileName) where Data : ISaveable
         {
             SaveLoadSystem<Data>.Save(hData, sFileName);
         }
 
-        public static Data Load<Data>(string sFileName) where Data : BaseSaveLoadData
+        public static Data Load<Data>(string sFileName) where Data : ISaveable
         {
-            return Instance?.MainLoad<Data>(sFileName);
+            if (Instance == null)
+                return default;
+
+            return m_hInstance.MainLoad<Data>(sFileName);
         }
 
-        protected virtual Data MainLoad<Data>(string sFileName) where Data : BaseSaveLoadData
+        protected virtual Data MainLoad<Data>(string sFileName) where Data : ISaveable
         {
             return SaveLoadSystem<Data>.Load(sFileName);
         }
 
-        public static void SaveTempData<Data>(Data hData,string sFileName) where Data : BaseSaveLoadData,new()
+        public static void SaveTempData<Data>(Data hData,string sFileName) where Data : struct, ISaveable
         {
             Instance?.MainSaveTempData(hData, sFileName);
         }
 
-        protected virtual void MainSaveTempData<Data>(Data hData,string sFileName) where Data : BaseSaveLoadData,new()
+        protected virtual void MainSaveTempData<Data>(Data hData,string sFileName) where Data : struct, ISaveable
         {
             if (m_dicData.ContainsKey(sFileName))
             {
-                var hOutData = m_dicData[sFileName];
-                hOutData.Clear();
-                hOutData.CopyFrom(hData);
-                m_dicData[sFileName] = hOutData;
+                m_dicData[sFileName] = hData;
             }
             else
             {
-                var hNewData = new Data();
-                hNewData.CopyFrom(hData);
-                m_dicData.Add(sFileName, hNewData);
+                m_dicData.Add(sFileName, hData);
             }
         }
 
-        public static void LoadTempData<Data>(string sFileName,ref Data hLoadData) where Data : BaseSaveLoadData,new()
+        public static Data LoadTempData<Data>(string sFileName) where Data : struct, ISaveable
         {
-            Instance?.MainLoadTempData(sFileName, ref hLoadData);
+            return m_hInstance.MainLoadTempData<Data>(sFileName);
         }
 
-        protected virtual void MainLoadTempData<Data>(string sFileName, ref Data hLoadData) where Data : BaseSaveLoadData,new()
+        protected virtual Data MainLoadTempData<Data>(string sFileName) where Data : struct, ISaveable
         {
-            MainTryLoadTempData(sFileName, ref hLoadData);
+            MainTryLoadTempData<Data>(sFileName, out var hLoadData);
+            return hLoadData;
         }
 
-        public static bool TryLoadTempData<Data>(string sFileName,ref Data hLoadData) where Data : BaseSaveLoadData,new()
+        public static bool TryLoadTempData<Data>(string sFileName,out Data hLoadData) where Data : struct, ISaveable
         {
+            hLoadData = default;
             if (Instance == null)
                 return false;
 
-            return m_hInstance.MainTryLoadTempData(sFileName, ref hLoadData);
+            return m_hInstance.MainTryLoadTempData(sFileName, out hLoadData);
         }
 
-        protected virtual bool MainTryLoadTempData<Data>(string sFileName,ref Data hLoadData) where Data : BaseSaveLoadData,new()
+        protected virtual bool MainTryLoadTempData<Data>(string sFileName, out Data hLoadData) where Data : struct, ISaveable
         {
+            hLoadData = default;
             if (!m_dicData.TryGetValue(sFileName, out var hOutData) || hOutData == null)
             {
                 Debug.LogError("Don't have temp data file " + sFileName);
@@ -144,11 +145,7 @@ namespace DSC.IO
                 return false;
             }
 
-            var hData = hOutData as Data;
-            if (hLoadData == null)
-                hLoadData = new Data();
-
-            hLoadData.CopyFrom(hData);
+            hLoadData = (Data) hOutData;
             return true;
         }
 
