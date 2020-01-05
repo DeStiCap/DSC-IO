@@ -1,0 +1,16 @@
+{
+    "name": "com.dsc.io",
+    "author": "Supawich Dechpuwarat",
+    "displayName": "DSC IO",
+    "version": "0.0.0-preview.1",
+    "unity": "2019.3",
+    "keywords": [
+        "IO"
+    ],
+    "description": "Helper plugin for IO.",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/DeStiCap/DSC-IO.git",
+		"revision": "451c15a44e552ce22c1fa6c31caf3bb7479b4aa6"
+	}
+}
