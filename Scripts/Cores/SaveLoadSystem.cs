@@ -18,10 +18,11 @@ namespace DSC.IO
 
             BinaryFormatter hFormatter = new BinaryFormatter();            
             string sPath = Path.Combine(sFolder, sFileName);
-            FileStream hStream = new FileStream(sPath, FileMode.Create);
-
-            hFormatter.Serialize(hStream, hData);
-            hStream.Close();
+            using (FileStream hStream = new FileStream(sPath, FileMode.Create))
+            {
+                hFormatter.Serialize(hStream, hData);
+                hStream.Close();
+            }
         }
 
         public static SaveLoadData Load(string sFileName)
@@ -39,17 +40,20 @@ namespace DSC.IO
             if (File.Exists(sPath))
             {
                 BinaryFormatter hFormatter = new BinaryFormatter();
-                FileStream hStream = new FileStream(sPath, FileMode.Open);
 
-                SaveLoadData hData = (SaveLoadData)hFormatter.Deserialize(hStream);
-                hStream.Close();
-                return hData;
+                using (FileStream hStream = new FileStream(sPath, FileMode.Open))
+                {
+                    SaveLoadData hData = (SaveLoadData)hFormatter.Deserialize(hStream);
+                    hStream.Close();
+                    return hData;
+                }
             }
             else
             {
-                Debug.LogError("Save file not found in " + sPath);
-                return default;
+                Debug.LogError("Save file not found in " + sPath);                
             }
+
+            return default;
         }
     }
 }
