@@ -112,17 +112,17 @@ namespace DSC.IO
             }
         }
 
-        public static void LoadTempData<Data>(string sFileName,ref Data hLoadData) where Data : BaseSaveLoadData
+        public static void LoadTempData<Data>(string sFileName,ref Data hLoadData) where Data : BaseSaveLoadData,new()
         {
             Instance?.MainLoadTempData(sFileName, ref hLoadData);
         }
 
-        protected virtual void MainLoadTempData<Data>(string sFileName, ref Data hLoadData) where Data : BaseSaveLoadData
+        protected virtual void MainLoadTempData<Data>(string sFileName, ref Data hLoadData) where Data : BaseSaveLoadData,new()
         {
             MainTryLoadTempData(sFileName, ref hLoadData);
         }
 
-        public static bool TryLoadTempData<Data>(string sFileName,ref Data hLoadData) where Data : BaseSaveLoadData
+        public static bool TryLoadTempData<Data>(string sFileName,ref Data hLoadData) where Data : BaseSaveLoadData,new()
         {
             if (Instance == null)
                 return false;
@@ -130,7 +130,7 @@ namespace DSC.IO
             return m_hInstance.MainTryLoadTempData(sFileName, ref hLoadData);
         }
 
-        protected virtual bool MainTryLoadTempData<Data>(string sFileName,ref Data hLoadData) where Data : BaseSaveLoadData
+        protected virtual bool MainTryLoadTempData<Data>(string sFileName,ref Data hLoadData) where Data : BaseSaveLoadData,new()
         {
             if (!m_dicData.TryGetValue(sFileName, out var hOutData) || hOutData == null)
             {
@@ -145,6 +145,9 @@ namespace DSC.IO
             }
 
             var hData = hOutData as Data;
+            if (hLoadData == null)
+                hLoadData = new Data();
+
             hLoadData.CopyFrom(hData);
             return true;
         }
