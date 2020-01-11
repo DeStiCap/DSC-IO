@@ -4,9 +4,9 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace DSC.IO
 {
-    public static class SaveLoadSystem<SaveLoadData>
+    public static class SaveLoadSystem
     {
-        public static void Save(SaveLoadData hData,string sFileName)
+        public static void Save<SaveLoadData>(SaveLoadData hData,string sFileName)
         {
             string sFolder = Path.Combine(Application.persistentDataPath, "Save");
             sFileName += ".sav";
@@ -25,7 +25,7 @@ namespace DSC.IO
             }
         }
 
-        public static SaveLoadData Load(string sFileName)
+        public static SaveLoadData Load<SaveLoadData>(string sFileName)
         {
             string sFolder = Path.Combine(Application.persistentDataPath, "Save");
             if (!Directory.Exists(sFolder))
@@ -35,8 +35,8 @@ namespace DSC.IO
             }
 
             sFileName += ".sav";
-
             string sPath = Path.Combine(sFolder, sFileName);
+
             if (File.Exists(sPath))
             {
                 BinaryFormatter hFormatter = new BinaryFormatter();
@@ -54,6 +54,19 @@ namespace DSC.IO
             }
 
             return default;
+        }
+
+        public static bool HasSaveFile(string sFileName)
+        {
+            string sFolder = Path.Combine(Application.persistentDataPath, "Save");
+
+            if (!Directory.Exists(sFolder))
+                return false;
+
+            sFileName += ".sav";
+            string sPath = Path.Combine(sFolder, sFileName);
+
+            return File.Exists(sPath);
         }
     }
 }

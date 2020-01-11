@@ -2,7 +2,7 @@
     "name": "com.dsc.io",
     "author": "Supawich Dechpuwarat",
     "displayName": "DSC IO",
-    "version": "0.0.0-preview.5",
+    "version": "0.0.1-preview.1",
     "unity": "2019.3",
     "keywords": [
         "IO"
@@ -11,6 +11,6 @@
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/DeStiCap/DSC-IO.git",
-		"revision": "451c15a44e552ce22c1fa6c31caf3bb7479b4aa6"
+		"revision": "21b5da1eaf9ebdb5305bccf448769f05b1f49d79"
 	}
 }

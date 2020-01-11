@@ -77,7 +77,7 @@ namespace DSC.IO
 
         protected virtual void MainSave<Data>(Data hData,string sFileName) where Data : ISaveable
         {
-            SaveLoadSystem<Data>.Save(hData, sFileName);
+            SaveLoadSystem.Save(hData, sFileName);
         }
 
         public static Data Load<Data>(string sFileName) where Data : ISaveable
@@ -90,7 +90,12 @@ namespace DSC.IO
 
         protected virtual Data MainLoad<Data>(string sFileName) where Data : ISaveable
         {
-            return SaveLoadSystem<Data>.Load(sFileName);
+            return SaveLoadSystem.Load<Data>(sFileName);
+        }
+
+        public static bool HasSaveFile(string sFileName)
+        {
+            return SaveLoadSystem.HasSaveFile(sFileName);
         }
 
         public static void SaveTempData<Data>(Data hData,string sFileName) where Data : struct, ISaveable
